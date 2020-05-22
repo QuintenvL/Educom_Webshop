@@ -1,0 +1,48 @@
+SQL queries:
+<Select all products>
+SELECT name, image,price, product_id
+FROM products;
+
+<Select 1 product (for detail page)>
+SELECT name, image, price, description, category, size, weight
+FROM products
+WHERE product_id = $productID
+
+<put order in orders user_id from session>
+INSERT INTO orders (user_id)
+VALUES ($userId)
+
+<put product order in product_order>
+INSERT INTO product_order (order_id, product_id, price, amount)
+VALUES (
+	LAST_INSERT_ID(), $productId, $price, $amount);
+
+<calculate the total_price of each order>
+SELECT
+    order_id,
+    SUM(product_order.total_price) total_price
+FROM
+    products
+INNER JOIN product_order USING(product_id)
+GROUP BY order_id;
+
+<Add new order to orders and add a product order to product_order>
+INSERT INTO orders (user_id)
+VALUES ($user_id);
+INSERT INTO product_order (order_id, product_id, price, amount)
+VALUES
+	($orderId, $productId, $price, $amount);,
+	($orderId, $productId, $price, $amount);
+
+<add extra column to product order which will always calculate the total price>
+ALTER TABLE product_order
+ADD COLUMN total_price DECIMAL(10,2) GENERATED ALWAYS AS (price*amount);
+
+<Select the 5 most ordered products in the last week> (selects the product id, product name, product image_dir and the total amount)
+SELECT p_o.product_id, p.name, p.image_dir, SUM(p_o.amount) as total_amount
+FROM (SELECT order_id FROM orders WHERE order_date >= ADDDATE(CURRENT_DATE(), INTERVAL -7 DAY)) AS latest_order
+LEFT JOIN product_order p_o USING(order_id)
+LEFT JOIN products p USING(product_id)
+GROUP BY p_o.product_id
+ORDER BY total_amount DESC
+LIMIT 5

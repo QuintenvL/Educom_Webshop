@@ -1,0 +1,22 @@
+.bg{
+	background-image: radial-gradient(white, lightblue);
+}
+img {
+	object-fit:contain;
+}
+
+img.shop {
+	height:150px;
+}
+
+img.top{
+	height:60px;
+	width: 60px;
+}
+img.detail{
+	height:300px;
+}
+
+button.updateButton{
+	font-size: 10px;
+}
